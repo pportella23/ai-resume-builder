@@ -296,12 +296,12 @@ POST /api/subscriptions/cancel
 - ✅ Set up responsive design
 - ✅ Create loading states and error handling
 
-#### Week 6: Resume Management UI
-**Day 1-2: Resume Upload & Management**
-- Create resume upload interface
-- Implement drag-and-drop functionality
-- Create resume list and management UI
-- Set up file preview system
+#### Week 6: Resume Management UI 🔄 (In Progress)
+**Day 1-2: Resume Upload & Management** ✅
+- ✅ Create resume upload interface
+- ✅ Implement drag-and-drop functionality
+- ✅ Create resume list and management UI
+- ✅ Set up file preview system
 
 **Day 3-4: AI Generation Interface**
 - Create job description input form
