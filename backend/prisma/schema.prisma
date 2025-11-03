@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  passwordHash      String?  @map("password_hash")
+  name              String
+  avatarUrl         String?  @map("avatar_url")
+  subscriptionStatus String  @default("free") @map("subscription_status")
+  stripeCustomerId  String?  @map("stripe_customer_id")
+  usageCount        Int      @default(0) @map("usage_count")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  socialLogins      SocialLogin[]
+  resumes           Resume[]
+  subscriptions     Subscription[]
+  portfolios        Portfolio[]
+  usageLogs         UsageLog[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model SocialLogin {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  provider        String
+  providerUserId  String   @map("provider_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("social_logins")
+}
+
+model Resume {
+  id                  String   @id @default(uuid())
+  userId              String   @map("user_id")
+  originalContent     String   @map("original_content")
+  jobDescription      String   @map("job_description")
+  aiGeneratedContent  String?  @map("ai_generated_content")
+  templateUsed        String   @default("tech-focused") @map("template_used")
+  compatibilityScore  Decimal? @map("compatibility_score") @db.Decimal(3, 2)
+  s3FilePath          String?  @map("s3_file_path")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("resumes")
+}
+
+model Subscription {
+  id                  String   @id @default(uuid())
+  userId              String   @map("user_id")
+  stripeSubscriptionId String? @unique @map("stripe_subscription_id")
+  status              String
+  planType            String   @default("premium") @map("plan_type")
+  currentPeriodStart  DateTime? @map("current_period_start")
+  currentPeriodEnd    DateTime? @map("current_period_end")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model Portfolio {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  amplifyAppId String? @map("amplify_app_id")
+  domainName  String?  @map("domain_name")
+  content     Json?
+  status      String   @default("building")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("portfolios")
+}
+
+model UsageLog {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  actionType  String   @map("action_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("usage_logs")
+}
